@@ -1,4 +1,4 @@
-using Assets.Scripts.Segment;
+using Assets.Scripts.Zenject;
 using UnityEngine;
 using Zenject;
 
@@ -6,25 +6,17 @@ namespace Assets.Scripts.List
 {
     public class ListFacade : MonoBehaviour
     {
-        [SerializeField] private readonly SegmentFacade myGameObject;
-        private ListManager listManager;
-        private GameObject listPanel;
+        private SignalBus signalBus;
 
         [Inject]
-        private void Construct(ListManager listManager, GameObject listPanel)
+        private void Construct(SignalBus signalBus)
         {
-            this.listManager = listManager;
-            this.listPanel = listPanel;
+            this.signalBus = signalBus;
         }
 
-        private void Start()
+        public void Button()
         {
-
-            for (int i = 0; i < listManager.ListImages.Count; i++)
-            {
-                // Instantiate(myGameObject, listPanel.transform);
-                //newObject.transform.position = listManager.ListImages[i];
-            }
+            signalBus.Fire<OnPressButtonSignal>();
         }
     }
 }

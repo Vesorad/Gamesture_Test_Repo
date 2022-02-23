@@ -1,5 +1,6 @@
 using Assets.Scripts.List;
 using Assets.Scripts.Zenject;
+using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
@@ -7,12 +8,16 @@ namespace Assets.Scripts.Segment
 {
     public class SegmentManager : IInitializable
     {
-        private readonly ListManager listManager;
-        private readonly SegmentFacade segmentFacade;
+        private const string TimeToBuildMessage = "Czas do stworzenia pliku: ";
 
-        private readonly Text nameImage;
-        private readonly Text timeToBuildImage;
-        private readonly Image image;
+        private ListManager listManager;
+        private SegmentFacade segmentFacade;
+
+        private Text nameImage;
+        private Text timeToBuildImage;
+        private Image image;
+
+        private int myNumber;
 
         public SegmentManager(ListManager listManager, Image image, SegmentFacade segmentFacade,
            [Inject(Id = SegmentInstallerIDs.NameImageID)] Text nameImage,
@@ -27,7 +32,29 @@ namespace Assets.Scripts.Segment
 
         public void Initialize()
         {
-            image.sprite = listManager.ListImages[segmentFacade.transform.GetSiblingIndex()];
+            Refresh();
+        }
+
+        public void Refresh()
+        {
+            if (segmentFacade.isActiveAndEnabled)
+            {
+                SetImage();
+                UpdateTexts();
+            }
+        }
+
+        private void UpdateTexts()
+        {
+            nameImage.text = listManager.ListImages[myNumber].name;
+
+            timeToBuildImage.text = (TimeToBuildMessage + Time.time);
+        }
+
+        private void SetImage()
+        {
+            myNumber = segmentFacade.GetsPoolNumber - 1;
+            image.sprite = listManager.ListImages[myNumber];
         }
     }
 }

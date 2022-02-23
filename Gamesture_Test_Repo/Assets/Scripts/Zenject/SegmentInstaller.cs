@@ -7,20 +7,27 @@ namespace Assets.Scripts.Zenject
 {
     public class SegmentInstaller : MonoInstaller
     {
-        [SerializeField] private readonly Image image;
-        [SerializeField] private readonly Text nameImage;
-        [SerializeField] private readonly Text timeTobuildImage;
+        [SerializeField] private Image image;
+        [SerializeField] private Text nameImage;
+        [SerializeField] private Text timeTobuildImage;
+        [SerializeField] private RectTransform rectTransform;
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<SegmentFacade>().FromComponentOnRoot().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<SegmentFacade>().FromComponentOnRoot().AsSingle();
+
             Container.BindInterfacesAndSelfTo<SegmentManager>().AsSingle();
+
             Container.BindInstance(image).AsSingle();
+            Container.BindInstance(rectTransform).AsSingle();
+            Container.Bind<Text>().WithId(SegmentInstallerIDs.NameImageID).FromInstance(nameImage).AsCached();
+            Container.Bind<Text>().WithId(SegmentInstallerIDs.TimeTobuildImageID).FromInstance(timeTobuildImage).AsCached();
 
-            Container.Bind<Text>().WithId(SegmentInstallerIDs.NameImageID).
-                FromInstance(nameImage).AsCached();
+            BindSignals();
+        }
 
-            Container.Bind<Text>().WithId(SegmentInstallerIDs.TimeTobuildImageID).
-                FromInstance(timeTobuildImage).AsCached();
+        public void BindSignals()
+        {
+            Container.BindSignal<OnPressButtonSignal>().ToMethod<SegmentManager>((x, s) => x.Refresh()).FromResolve();
         }
     }
 

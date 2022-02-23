@@ -1,24 +1,40 @@
+using Assets.Scripts.List;
 using Assets.Scripts.Zenject;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 namespace Assets.Scripts.Segment
 {
-    public class SegmentFacade : MonoBehaviour
+    public class SegmentFacade : MonoBehaviour, IPoolable<IMemoryPool>
     {
-        private Text nameImage;
-        private Text timeToBuildImage;
-        private Image image;
+        public int GetsPoolNumber => myNumber;
 
-        [Inject]
-        private void Construct(Image image, [Inject(Id = SegmentInstallerIDs.NameImageID)] Text nameImage,
-           [Inject(Id = SegmentInstallerIDs.TimeTobuildImageID)] Text timeToBuildImage)
+        private IMemoryPool pool;
+        private int myNumber;
+
+        public void Despawn()
         {
-            this.image = image;
-            this.nameImage = nameImage;
-            this.timeToBuildImage = timeToBuildImage;
+            pool.Despawn(this);
         }
 
+        public void OnSpawned(IMemoryPool pool)
+        {
+            this.pool = pool;
+            myNumber = pool.NumActive;
+        }
+
+        public void OnDespawned()
+        {
+        }
+
+        public class Factory : PlaceholderFactory<SegmentFacade>
+        {
+        } 
+
+        public class Pool : MonoPoolableMemoryPool<IMemoryPool, SegmentFacade>
+        {
+        }      
     }
 }
